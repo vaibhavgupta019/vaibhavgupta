@@ -1,6 +1,6 @@
 - 👋 Hi, I’m @vaibhavgupta019
 - 👀 I’m interested in coding
-- 🌱 I’m currently learning cloud
+- 🌱 I’m currently learning cloud and data engineering 
 - 💞️ I’m looking to collaborate on new skills
 - 📫 How to reach me vaibhavgupta9926@gmail.com
 
