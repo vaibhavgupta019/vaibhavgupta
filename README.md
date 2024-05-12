@@ -1,7 +1,7 @@
 - 👋 Hi, I’m @vaibhavgupta019
-- 👀 I’m interested in coding
-- 🌱 I’m currently learning cloud and data engineering 
-- 💞️ I’m looking to collaborate on new skills
+- 👀 I’m a Data Engineer.
+- 🌱 Always eager to learn new skills available in the field of Data Engineering. 
+- 💞️ Skills: SQL, Python, PySpark, Pandas, Azure Synapse, Azure Data Factory, Data warehousing, ETL, Databricks
 - 📫 How to reach me vaibhavgupta9926@gmail.com
 
 <!---
