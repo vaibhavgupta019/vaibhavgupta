@@ -1,0 +1,105 @@
+{
+    "sql_template":[
+        {
+            "merge_ind":"Y",
+            "templates":[
+                {
+                    "query_template":"null_check",
+                    "query":"(CASE WHEN {col_name} IS NOT NULL THEN 1 ELSE 0 END)",
+                    "query_scope":"any"
+                },
+                {
+                    "query_template":"space_check",
+                    "query":"(CASE WHEN trim({col_name}) != '' THEN 1 ELSE 0 END)",
+                    "query_scope":"string"
+    
+                },
+                {
+                    "query_template":"lspace_check",
+                    "query":"(CASE WHEN len({col_name}) = len(ltrim({col_name})) THEN 1 ELSE 0 END)",
+                    "query_scope":"string"
+    
+                },
+                {
+                    "query_template":"tspace_check",
+                    "query":"(CASE WHEN len({col_name}) = len(rtrim({col_name})) THEN 1 ELSE 0 END)",
+                    "query_scope":"string"
+                },
+                {
+                    "query_template":"dspace_check",
+                    "query":"(CASE WHEN len({col_name}) = len(regexp_replace({col_name}, ' +', ' ')) THEN 1 ELSE 0 END)",
+                    "query_scope":"string"
+                },
+                {
+                    "query_template":"length_check",
+                    "query":"(CASE WHEN len(regexp_replace({col_name}, '\\s+', '')) {expr} THEN 1 ELSE 0 END)",
+                    "query_scope":"string"
+                },
+                {
+                    "query_template":"expr_check",
+                    "query":"(CASE WHEN {expr} THEN 1 ELSE 0 END)",
+                    "query_scope":"any"
+                },
+                {
+                    "query_template":"regex_check",
+                    "query":"(CASE WHEN {col_name} rlike '{expr}' THEN 1 ELSE 0 END)",
+                    "query_scope":"string"
+                },
+                {
+                    "query_template":"date_check",
+                    "query":"(CASE WHEN to_date({col_name}, '{expr}') IS NOT NULL THEN 1 ELSE 0 END)",
+                    "query_scope":"string"
+                },
+                {
+                    "query_template":"timeliness_check",
+                    "query":"(CASE WHEN datediff(current_date, {col_name}) {expr} THEN 1 ELSE 0 END)",
+                    "query_scope":"string,date,timestamp"
+                }
+            ]
+        },
+        {
+            "merge_ind":"N",
+            "templates":[
+                {
+                    "query_template":"ri_check",
+                    "query":"SELECT c.{primary_id} AS pkey, (CASE WHEN p.{parent_col} IS NOT NULL THEN 1 ELSE 0 END) AS {col_id}_{rule_id} FROM {db}.{tbl} c LEFT JOIN {parent_tbl} p ON c.{col_name} = p.{parent_col}",
+                    "query_scope":"string"
+                },
+                {
+                    "query_template":"distinct_check",
+                    "query":"SELECT {primary_id} AS pkey, (CASE WHEN (row_number() over(partition by {col_name} order by {col_name})) = 1 THEN 1 ELSE 0 END) AS {col_id}_{rule_id} FROM {db}.{tbl}",
+                    "query_scope":"any"
+                }
+            ]
+        }
+    
+    ],
+    "sql":[
+        {
+            "query":"order_amt_check",
+            "sql":"SELECT o.{primary_id} AS pkey, (CASE WHEN o.total_order_value = round(oi.price + oi.freight_value,2) THEN 1 ELSE 0 END) AS {col_id}_{rule_id} FROM retail.ol_orders o INNER JOIN (SELECT order_id,SUM(price) as price, SUM(freight_value) as freight_value FROM retail.ol_orders_items GROUP BY order_id ) oi ON o.order_id = oi.order_id"
+        },
+        {
+            "query":"inv_amt_check",
+            "sql":"SELECT i.{primary_id} AS pkey, (CASE WHEN i.invoice_amt = o.total_order_value THEN 1 ELSE 0 END) AS {col_id}_{rule_id} FROM finance.ol_invoice i INNER JOIN retail.ol_orders o ON i.order_id = o.order_id"
+        }
+    ],
+    "api":[
+        {
+            "api_template":"outlier_check",
+            "api_call": "outlier_check",
+            "api_scope":"int,integer,long,bigint,float,real,double,decimal,dec,numeric"
+        },
+        {
+            "api_template":"distinct_check",
+            "api_call":"fuzzy_duplicate_check",
+            "api_scope":"string"
+        },
+        {
+            "api_template":"anomaly_check",
+            "api_call": "anomaly_check",
+            "api_scope":"int,integer,long,bigint,float,real,double,decimal,dec,numeric"
+        }
+
+    ]
+}
