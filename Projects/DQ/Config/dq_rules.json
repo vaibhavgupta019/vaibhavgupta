@@ -1,0 +1,351 @@
+[
+    {
+        "source_system": "crm",
+        "database_name":"retail",
+        "table_name":"customers",
+        "primary_id":"customer_id",
+        "rules":[
+            {
+                "rule_name":"null_check",
+                "rule_dim":"completeness",
+                "rule_scope":"table",
+                "rule_status": "active",
+                "query_template":"null_check",
+                "track_failed_rec":"N"
+            },
+            {
+                "rule_name":"space_check",
+                "rule_dim":"completeness",
+                "rule_scope":"column",
+                "column_name":"tax_id",
+                "rule_status": "active",
+                "query_template":"space_check",
+                "track_failed_rec":"Y"
+            },
+            {
+                "rule_name":"qty_check",
+                "rule_dim":"validity",
+                "rule_scope":"column",
+                "column_name":"units_purchased",
+                "rule_status": "active",
+                "query_template":"expr_check",
+                "track_failed_rec":"Y",
+                "params":[{"expr":"units_purchased > 0"}]
+            },
+            {
+                "rule_name":"outlier_check",
+                "rule_dim":"validity",
+                "rule_scope":"column",
+                "column_name":"units_purchased",
+                "rule_status": "active",
+                "api_template":"outlier_check"
+            },
+            {
+                "rule_name":"email_check",
+                "rule_dim":"validity",
+                "rule_scope":"column",
+                "column_name":"email_addr",
+                "rule_status": "active",
+                "query_template":"regex_check",
+                "params":[{"expr":"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\\.[A-Z|a-z]{2,})+"}]
+
+            },
+            {
+                "rule_name":"zipcode_check",
+                "rule_dim":"validity",
+                "rule_scope":"column",
+                "column_name":"postcode",
+                "rule_status": "active",
+                "query_template":"regex_check",
+                "params":[{"expr":"^[0-9]{5}(?:-[0-9]{4})?$"}]
+
+            },
+            {
+                "rule_name":"date_check",
+                "rule_dim":"validity",
+                "rule_scope":"column",
+                "column_name":"valid_to_dt",
+                "rule_status": "active",
+                "query_template":"date_check",
+                "params":[{"expr":"yyyy-MM-dd" }]
+
+            },
+            {
+                "rule_name":"timestamp_check",
+                "rule_dim":"validity",
+                "rule_scope":"column",
+                "column_name":"valid_to_ts",
+                "rule_status": "active",
+                "query_template":"date_check",
+                "params":[{"expr":"yyyy-MM-dd HH:mm:ss" }]
+            },
+            {
+                "rule_name":"distinct_check",
+                "rule_dim":"uniqueness",
+                "rule_scope":"column",
+                "column_name":"customer_id",
+                "rule_status": "active",
+                "query_template":"distinct_check"
+            },
+            { 
+                "rule_name":"timeliness_check",
+                "rule_dim":"timeliness",
+                "rule_scope":"column",
+                "column_name":"valid_from_dt",
+                "rule_status": "active",
+                "query_template":"timeliness_check",
+                "params":[{"expr":"<= 1210"}]
+            }
+        ]
+    },
+    {
+        "source_system": "crm",
+        "database_name":"retail",
+        "table_name":"products",
+        "primary_id":"product_id",
+        "rules":[
+            {
+                "rule_name":"null_check",
+                "rule_dim":"completeness",
+                "rule_scope":"table",
+                "rule_status": "active",
+                "query_template":"null_check"
+
+            },
+            {
+                "rule_name":"lspace_check",
+                "rule_dim":"completeness",
+                "rule_scope":"column",
+                "column_name":"product_name,product_category,product_unit",
+                "rule_status": "active",
+                "query_template":"lspace_check",
+                "track_failed_rec":"Y"
+
+            },
+            {
+                "rule_name":"tspace_check",
+                "rule_dim":"completeness",
+                "rule_scope":"column",
+                "column_name":"product_name,product_category,product_unit",
+                "rule_status": "active",
+                "query_template":"tspace_check"
+
+            },
+            {
+                "rule_name":"dspace_check",
+                "rule_dim":"completeness",
+                "rule_scope":"column",
+                "column_name":"product_name,product_category,product_unit",
+                "rule_status": "active",
+                "query_template":"dspace_check"
+
+            },
+            {
+                "rule_name":"length_check",
+                "rule_dim":"completeness",
+                "rule_scope":"column",
+                "column_name":"ean13",
+                "rule_status": "active",
+                "query_template":"length_check",
+                "params":[{"expr":"= 13"}]
+            }
+        ]
+    },
+    {
+        "source_system": "crm",
+        "database_name":"retail",
+        "table_name":"ol_customers",
+        "primary_id":"customer_id",
+        "rules":[
+            {
+                "rule_name":"null_check",
+                "rule_dim":"completeness",
+                "rule_scope":"table",
+                "rule_status": "active",
+                "query_template":"null_check"
+
+            }]
+    },
+    {
+        "source_system": "crm",
+        "database_name":"retail",
+        "table_name":"ol_geolocation",
+        "primary_id":"geolocation_zip_code_prefix",
+        "rules":[
+            {
+                "rule_name":"null_check",
+                "rule_dim":"completeness",
+                "rule_scope":"table",
+                "rule_status": "active",
+                "query_template":"null_check"
+
+            }]
+    },
+    {
+        "source_system":"crm",
+        "database_name":"retail",
+        "table_name":"ol_orders",
+        "primary_id":"order_id",
+        "rules":[
+            {
+                "rule_name":"total_value_check",
+                "rule_dim":"accuracy",
+                "rule_scope":"column",
+                "column_name":"total_order_value",
+                "rule_status": "active",
+                "query":"order_amt_check"
+            },
+            {
+                "rule_name":"order_cust_ri_check",
+                "rule_dim":"integrity",
+                "rule_scope":"column",
+                "column_name":"customer_id",
+                "rule_status": "active",
+                "query_template":"ri_check",
+                "track_failed_rec":"Y",
+                "params":[{"parent_tbl":"retail.ol_customers", "parent_col":"customer_id"}]
+            }
+        ]
+    },
+    {
+        "source_system": "crm",
+        "database_name":"retail",
+        "table_name":"ol_orders_items",
+        "primary_id":"order_id",
+        "rules":[
+            {
+                "rule_name":"null_check",
+                "rule_dim":"completeness",
+                "rule_scope":"table",
+                "rule_status": "active",
+                "query_template":"null_check"
+
+            }]
+    },
+    {
+        "source_system": "crm",
+        "database_name":"retail",
+        "table_name":"ol_products",
+        "primary_id":"product_id",
+        "rules":[
+            {
+                "rule_name":"null_check",
+                "rule_dim":"completeness",
+                "rule_scope":"table",
+                "rule_status": "active",
+                "query_template":"null_check"
+
+            }]
+    },
+    {
+        "source_system": "crm",
+        "database_name":"retail",
+        "table_name":"ol_sellers",
+        "primary_id":"seller_id",
+        "rules":[
+            {
+                "rule_name":"null_check",
+                "rule_dim":"completeness",
+                "rule_scope":"table",
+                "rule_status": "active",
+                "query_template":"null_check"
+
+            }]
+    },
+    {
+        "source_system": "crm",
+        "database_name":"retail",
+        "table_name":"olist_order_reviews",
+        "primary_id":"review_id",
+        "rules":[
+            {
+                "rule_name":"null_check",
+                "rule_dim":"completeness",
+                "rule_scope":"table",
+                "rule_status": "active",
+                "query_template":"null_check"
+
+            }]
+    },
+    {
+        "source_system": "crm",
+        "database_name":"retail",
+        "table_name":"restaurants",
+        "primary_id":"id",
+        "rules":[
+            {
+                "rule_name":"null_check",
+                "rule_dim":"completeness",
+                "rule_scope":"table",
+                "rule_status": "active",
+                "query_template":"null_check"
+
+            },
+            {
+                "rule_name":"distinct_check",
+                "rule_dim":"uniqueness",
+                "rule_scope":"column",
+                "column_name":"name",
+                "rule_status": "active",
+                "api_template":"distinct_check",
+                "params":[{"col_list":"'address'","threshold":0.4}]
+            }]
+    },
+    {
+        "source_system":"finance",
+        "database_name":"finance",
+        "table_name":"ol_invoice",
+        "primary_id":"order_id",
+        "rules":[
+            {
+                "rule_name":"inv_amt_check",
+                "rule_dim":"consistency",
+                "rule_scope":"column",
+                "column_name":"invoice_amt",
+                "rule_status": "active",
+                "query":"inv_amt_check"
+            }
+        ]
+    },
+    {
+        "source_system": "thirdparty",
+        "database_name":"thirdparty",
+        "table_name":"providers",
+        "primary_id":"Rndrng_NPI",
+        "rules":[
+            {
+                "rule_name":"null_check",
+                "rule_dim":"completeness",
+                "rule_scope":"table",
+                "rule_status": "active",
+                "query_template":"null_check"
+
+            }]
+    },
+    {
+        "source_system": "nab",
+        "database_name":"nab",
+        "table_name":"temperature",
+        "primary_id":"",
+        "rules":[
+            {
+                "rule_name":"null_check",
+                "rule_dim":"completeness",
+                "rule_scope":"table",
+                "rule_status": "active",
+                "query_template":"null_check"
+
+            },
+            {
+                "rule_name":"anomaly_check",
+                "rule_dim":"validity",
+                "rule_scope":"column",
+                "column_name":"value",
+                "rule_status": "active",
+                "api_template":"anomaly_check",
+                "params":[{"col_list":"'hour,daylight,dayofweek,weekday'","contamination":0.01}]
+            }
+        ]
+    }
+    
+]

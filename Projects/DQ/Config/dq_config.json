@@ -1,0 +1,16 @@
+
+{
+    "dq_config":{
+            "rules_file":"dq_rules.json",
+            "query_template_file": "dq_templates.json"
+    },
+    "dq_metrics":{
+            "dq_metrics_db":"dqmetrics",
+            "dq_meta_db": "dq_db_metadata",
+            "dq_meta_tbl": "dq_tbl_metadata",
+            "dq_meta_col": "dq_col_metadata",
+            "dq_meta_rule": "dq_rules_metadata",
+            "dq_metrics": "dq_metrics",
+            "dq_check_failed":"dq_check_failed"
+    }
+}
